@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Meta Tags -->
+  <title>ShopEasy Data Analyst Agent | Live Multi-Agent Dashboard</title>
+  <meta name="description" content="Securely connect raw e-commerce data sources, define business questions, and view live AI-driven chart recommendations and strategic insights.">
+  <meta name="keywords" content="ShopEasy, Data Analyst, Multi-Agent System, Gemini 2.5 Flash, Chart.js, E-Commerce Analytics, Glassmorphism Dashboard">
+  <meta name="author" content="Antigravity AI">
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22url(%23g)%22/><defs><linearGradient id=%22g%22 x1=%220%25%22 y1=%220%25%22 x2=%22100%25%22 y2=%22100%25%22><stop offset=%220%25%22 stop-color=%22%236366f1%22/><stop offset=%22100%25%22 stop-color=%22%2306b6d4%22/></linearGradient></defs><text y=%22.9em%22 font-size=%2290%22 fill=%22%23ffffff%22>✦</text></svg>">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="index.css">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- Interactive Network Particle Background -->
+  <canvas id="particle-canvas" class="bg-canvas" aria-hidden="true"></canvas>
+  <div class="bg-radial-glow"></div>
+
+  <!-- Main Content Layout Wrapper -->
+  <div class="layout-wrapper">
+    
+    <!-- Top Global Header -->
+    <header>
+      <div class="logo">
+        <span class="logo-icon" aria-hidden="true"></span>
+        <span>ShopEasy Data Analyst Agent</span>
+      </div>
+      <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <button id="btn-open-settings" class="btn-icon-only" title="API Settings" aria-label="Open settings drawer">
+          ⚙️
+        </button>
+        <div class="status-badge">
+          <span class="status-dot" id="system-status-dot"></span>
+          <span id="system-status-text">System Active</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- STEP 1: DATA SOURCE INPUT -->
+    <main id="step-1" class="step-panel active hero-container">
+      <section class="glass-card">
+        <div class="card-glow"></div>
+        <div class="card-content">
+          <div class="pill">Step 1 of 3: Data Ingestion</div>
+          <h1>Connect Your <span class="gradient-text">Data Source</span></h1>
+          <p class="subtitle">Paste a Google Sheet CSV URL below to ingest and verify your operational records.</p>
+          
+          <div class="form-group">
+            <label for="csv-url-input">Google Sheet CSV URL</label>
+            <input type="url" id="csv-url-input" class="input-control" placeholder="https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?output=csv" required>
+          </div>
+          
+          <!-- Quick Load Buttons for Datasets -->
+          <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary" id="btn-load-v1" style="font-size: 0.8rem; padding: 0.5rem 1rem;">
+              ⚡ Load ShopEasy Orders v1
+            </button>
+            <button type="button" class="btn btn-secondary" id="btn-load-v2" style="font-size: 0.8rem; padding: 0.5rem 1rem;">
+              ⚡ Load ShopEasy Orders v2
+            </button>
+          </div>
+          
+          <button id="btn-ingest" class="btn" style="width: 100%; margin-bottom: 2rem;">
+            <span>Run Ingestion Pipeline</span>
+            <span class="btn-icon">→</span>
+          </button>
+
+          <!-- Data Ingest Preview Section (hidden by default) -->
+          <div id="ingest-preview-container" style="display: none; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+            <h3 style="text-align: left; margin-bottom: 1rem; color: var(--text-primary);">Data Schema Preview</h3>
+            
+            <div class="schema-preview-grid">
+              <!-- Sidebar Stats -->
+              <div class="preview-sidebar">
+                <div class="stat-box">
+                  <h4>Total Rows Ingested</h4>
+                  <div class="stat-val" id="preview-row-count">0</div>
+                </div>
+                <div class="stat-box">
+                  <h4>Calculated Date Range</h4>
+                  <div class="stat-val" id="preview-date-range" style="font-size: 1.05rem; line-height: 1.4; margin-top: 0.25rem;">N/A</div>
+                </div>
+              </div>
+              
+              <!-- Schema Table -->
+              <div class="table-container">
+                <table id="schema-table">
+                  <thead>
+                    <tr>
+                      <th>Column Name</th>
+                      <th>Detected Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Sample Rows Preview -->
+            <h3 style="text-align: left; margin-top: 1.5rem; margin-bottom: 1rem; color: var(--text-primary);">First 3 Sample Rows</h3>
+            <div class="table-container" style="margin-bottom: 2rem;">
+              <table id="sample-rows-table">
+                <thead>
+                  <tr id="sample-headers-row">
+                    <!-- Populated dynamically -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+            
+            <button id="btn-confirm-step1" class="btn" style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3); width: 100%;">
+              <span>Confirm Data & Proceed</span>
+              <span class="btn-icon">✓</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- STEP 2: BUSINESS QUESTIONS INPUT -->
+    <main id="step-2" class="step-panel hero-container">
+      <section class="glass-card">
+        <div class="card-glow"></div>
+        <div class="card-content">
+          <div class="pill">Step 2 of 3: Analyst Inquiry</div>
+          <h1>Define Your <span class="gradient-text">Business Questions</span></h1>
+          <p class="subtitle">Specify up to 5 plain-English inquiries. AI will recommend specific visualizations to answer each question.</p>
+          
+          <div id="questions-form-container">
+            <!-- Dynamic list of 5 question fields -->
+            <div class="form-group">
+              <label>Question 1 (Required)</label>
+              <div class="question-item">
+                <span class="question-number">1</span>
+                <input type="text" class="input-control question-input" required placeholder="e.g. How is revenue trending week over week this month?">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Question 2</label>
+              <div class="question-item">
+                <span class="question-number">2</span>
+                <input type="text" class="input-control question-input" placeholder="e.g. Which product categories are driving the most revenue?">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Question 3</label>
+              <div class="question-item">
+                <span class="question-number">3</span>
+                <input type="text" class="input-control question-input" placeholder="e.g. Which cities are our strongest markets?">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Question 4</label>
+              <div class="question-item">
+                <span class="question-number">4</span>
+                <input type="text" class="input-control question-input" placeholder="e.g. What percentage of orders are successfully delivered vs cancelled?">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Question 5</label>
+              <div class="question-item">
+                <span class="question-number">5</span>
+                <input type="text" class="input-control question-input" placeholder="e.g. What is our average delivery time?">
+              </div>
+            </div>
+          </div>
+          
+          <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button id="btn-back-to-step1" class="btn btn-secondary" style="flex: 1;">
+              Back
+            </button>
+            <button id="btn-submit-questions" class="btn" style="flex: 2;">
+              <span>Analyze Questions</span>
+              <span class="btn-icon">→</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- STEP 3: AI CHART RECOMMENDATIONS -->
+    <main id="step-3" class="step-panel hero-container" style="max-width: 1000px;">
+      <section class="glass-card" style="padding: 2.5rem 2rem;">
+        <div class="card-glow"></div>
+        <div class="card-content">
+          <div class="pill">Step 3 of 3: AI Chart Planner</div>
+          <h1>Review <span class="gradient-text">Visualization Blueprint</span></h1>
+          <p class="subtitle">The Chart Planner Agent has recommended layouts. Review or customize them before rendering.</p>
+          
+          <!-- Recommendation Cards Grid -->
+          <div class="config-cards-grid" id="recommendations-grid">
+            <!-- Cards will be populated dynamically by the planner agent -->
+          </div>
+          
+          <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <button id="btn-back-to-step2" class="btn btn-secondary" style="flex: 1;">
+              Back
+            </button>
+            <button id="btn-confirm-configs" class="btn" style="flex: 2; background: linear-gradient(135deg, #6366f1, #06b6d4);">
+              <span>Run Execution Pipeline</span>
+              <span class="btn-icon">⚡</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- STEPS 4 & 5: DYNAMIC DASHBOARD RENDERS -->
+    <main id="step-4-5" class="step-panel" style="max-width: 1200px;">
+      <!-- Dashboard Top Header Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div style="text-align: left;">
+          <h1 style="font-size: 2.25rem; margin-bottom: 0.5rem; text-align: left;">Live <span class="gradient-text">Analyst Dashboard</span></h1>
+          <div class="dashboard-meta">
+            <span class="dashboard-date-range" id="dashboard-date-range-badge">Loading dates...</span>
+            <span>Source: <a href="#" id="link-google-sheet" target="_blank" rel="noopener noreferrer" class="link-sheet">Open Google Sheet ↗</a></span>
+          </div>
+        </div>
+        <div>
+          <button id="btn-refresh-dashboard" class="btn" style="padding: 0.65rem 1.25rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-primary); box-shadow: none;">
+            🔄 Refresh Pipeline
+          </button>
+        </div>
+      </div>
+
+      <!-- Agent Status Panel -->
+      <section class="agent-status-strip">
+        <div class="agent-status-badge waiting" data-agent="ingest">
+          <div class="agent-info">
+            <span class="agent-title">Data Ingest Agent</span>
+            <span class="agent-subtitle">Parsing Raw Source</span>
+          </div>
+          <span class="badge-state">Waiting</span>
+        </div>
+        <div class="agent-status-badge waiting" data-agent="planner">
+          <div class="agent-info">
+            <span class="agent-title">Chart Planner Agent</span>
+            <span class="agent-subtitle">Gemini 2.5 Flash Setup</span>
+          </div>
+          <span class="badge-state">Waiting</span>
+        </div>
+        <div class="agent-status-badge waiting" data-agent="executor">
+          <div class="agent-info">
+            <span class="agent-title">Execution Agent</span>
+            <span class="agent-subtitle">Aggregating KPIs</span>
+          </div>
+          <span class="badge-state">Waiting</span>
+        </div>
+        <div class="agent-status-badge waiting" data-agent="insights">
+          <div class="agent-info">
+            <span class="agent-title">Insights Agent</span>
+            <span class="agent-subtitle">Gemini 2.5 Strategy Stream</span>
+          </div>
+          <span class="badge-state">Waiting</span>
+        </div>
+      </section>
+
+      <!-- Agent Operations Console (Monospace Terminal logs) -->
+      <section class="terminal-panel dashboard-console" aria-label="Agent Operations Console">
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot yellow"></span>
+            <span class="terminal-dot green"></span>
+          </div>
+          <div class="terminal-title">agent-ops-console@shopeasy:~</div>
+          <div style="width: 38px;"></div>
+        </div>
+        <div class="terminal-body" id="terminal-output">
+          <!-- Terminal lines will print here -->
+        </div>
+      </section>
+
+      <!-- KPI Metrics Cards Grid -->
+      <section class="kpis-grid">
+        <div class="kpi-card">
+          <div class="kpi-card-icon">💰</div>
+          <div class="kpi-card-content">
+            <h3>Total Revenue</h3>
+            <div class="kpi-val" id="kpi-revenue">$0</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-card-icon">📦</div>
+          <div class="kpi-card-content">
+            <h3>Total Orders</h3>
+            <div class="kpi-val" id="kpi-orders">0</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-card-icon">🚚</div>
+          <div class="kpi-card-content">
+            <h3>Avg. Delivery Time</h3>
+            <div class="kpi-val" id="kpi-delivery">0.0 days</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Output Charts Grid -->
+      <section class="charts-grid" id="dashboard-charts-container">
+        <!-- Rendered Chart Cards go here dynamically -->
+      </section>
+
+      <!-- AI Strategic Insights Block -->
+      <section class="insights-card">
+        <div class="insights-card-header">
+          <h3>Strategic Business Insights</h3>
+          <span class="insights-badge">Gemini 2.5 Flash Generated</span>
+        </div>
+        <div id="insights-container">
+          <!-- Bullet insights stream in here -->
+          <ul class="insights-list">
+            <li class="insight-item" style="color: var(--text-muted); font-style: italic;">
+              Waiting for execution pipeline to complete...
+            </li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- Global Footer -->
+    <footer>
+      <div>&copy; 2026 ShopEasy Analytics. Pair-programmed with Antigravity.</div>
+      <div>
+        <a href="https://github.com/saileshraveendran/agentic-ai-workshop-Jun2026" class="footer-link" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Settings Dialog Modal (API Key configuration) -->
+  <dialog id="settings-dialog" class="modal-overlay">
+    <div class="modal-card">
+      <h3 style="margin-bottom: 0.5rem; font-size: 1.25rem;">Gemini API Credentials</h3>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">
+        This dashboard queries Gemini 2.5 Flash directly from your browser. Input your personal Gemini API Key below. It is stored locally on your device.
+      </p>
+      
+      <div class="form-group">
+        <label for="settings-api-key">Google Gemini API Key</label>
+        <input type="password" id="settings-api-key" class="input-control" placeholder="AIzaSy...">
+      </div>
+      
+      <div class="modal-actions">
+        <button id="btn-settings-cancel" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Cancel</button>
+        <button id="btn-settings-save" class="btn" style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">Save Key</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Core Scripts -->
+  <script src="app.js" type="module"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      // --- PARTICLE BACKGROUND SYSTEM ---
+      const canvas = document.getElementById('particle-canvas');
+      const ctx = canvas.getContext('2d');
+      
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
+      
+      const particles = [];
+      const particleCount = Math.min(50, Math.floor((width * height) / 20000));
+      const maxDistance = 120;
+      
+      const mouse = { x: null, y: null, radius: 150 };
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+
+      window.addEventListener('mouseleave', () => {
+        mouse.x = null;
+        mouse.y = null;
+      });
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 0.4;
+          this.vy = (Math.random() - 0.5) * 0.4;
+          this.radius = Math.random() * 2 + 1;
+        }
+
+        update() {
+          if (this.x < 0 || this.x > width) this.vx *= -1;
+          if (this.y < 0 || this.y > height) this.vy *= -1;
+
+          this.x += this.vx;
+          this.y += this.vy;
+
+          if (mouse.x !== null) {
+            const dx = this.x - mouse.x;
+            const dy = this.y - mouse.y;
+            const dist = Math.hypot(dx, dy);
+            
+            if (dist < mouse.radius) {
+              const force = (mouse.radius - dist) / mouse.radius;
+              this.x += (dx / dist) * force * 0.5;
+              this.y += (dy / dist) * force * 0.5;
+            }
+          }
+        }
+
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(99, 102, 241, 0.3)';
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.hypot(dx, dy);
+
+            if (dist < maxDistance) {
+              const alpha = (1 - (dist / maxDistance)) * 0.12;
+              ctx.strokeStyle = `rgba(99, 102, 241, ${alpha})`;
+              ctx.lineWidth = 0.8;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+
+      // --- SETTINGS DIALOG MODAL ---
+      const settingsDialog = document.getElementById('settings-dialog');
+      const openSettingsBtn = document.getElementById('btn-open-settings');
+      const cancelSettingsBtn = document.getElementById('btn-settings-cancel');
+      const saveSettingsBtn = document.getElementById('btn-settings-save');
+      const apiKeyInput = document.getElementById('settings-api-key');
+
+      // Sync key initially
+      apiKeyInput.value = state.apiKey;
+      
+      // Prompt key if missing
+      if (!state.apiKey) {
+        settingsDialog.classList.add('active');
+        document.getElementById('system-status-dot').className = 'status-dot';
+        document.getElementById('system-status-text').textContent = 'Key Required';
+      }
+
+      openSettingsBtn.addEventListener('click', () => {
+        apiKeyInput.value = state.apiKey;
+        settingsDialog.classList.add('active');
+      });
+
+      cancelSettingsBtn.addEventListener('click', () => {
+        settingsDialog.classList.remove('active');
+      });
+
+      saveSettingsBtn.addEventListener('click', () => {
+        state.apiKey = apiKeyInput.value.trim();
+        localStorage.setItem('shopeasy_gemini_api_key', state.apiKey);
+        settingsDialog.classList.remove('active');
+        logger.log("System", "Gemini API Key updated successfully.", "success");
+        
+        if (state.apiKey) {
+          document.getElementById('system-status-dot').className = 'status-dot';
+          document.getElementById('system-status-text').textContent = 'System Active';
+        }
+      });
+
+      // --- STEP NAVIGATION HELPER ---
+      function goToStep(step) {
+        document.querySelectorAll('.step-panel').forEach(panel => {
+          panel.classList.remove('active');
+        });
+        const targetPanel = document.getElementById(`step-${step}`);
+        if (targetPanel) {
+          targetPanel.classList.add('active');
+          state.currentStep = step;
+        } else if (step === 4 || step === 5) {
+          document.getElementById('step-4-5').classList.add('active');
+          state.currentStep = 4;
+        }
+      }
+
+      // --- STEP 1: INGESTION CONTROL ---
+      const csvInput = document.getElementById('csv-url-input');
+      const ingestBtn = document.getElementById('btn-ingest');
+      const confirmStep1Btn = document.getElementById('btn-confirm-step1');
+      const previewContainer = document.getElementById('ingest-preview-container');
+      const previewRowCount = document.getElementById('preview-row-count');
+      const previewDateRange = document.getElementById('preview-date-range');
+      const schemaTableBody = document.getElementById('schema-table').querySelector('tbody');
+      const sampleHeadersRow = document.getElementById('sample-headers-row');
+      const sampleRowsTableBody = document.getElementById('sample-rows-table').querySelector('tbody');
+      
+      const v1Url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7nSFpTH_nKyzGimByHPmg4-7R-4iDnrVg_fjy0nTnNZ35Tn__w-UBCh--4SpdPnLWa9skAWpd_fx9/pub?gid=1701530588&single=true&output=csv";
+      const v2Url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQmzy1GyP2Y7g09SOcdmKoFUKQ8WMyAanBoLmzhTVEskhElSvYhI3WwOXXeO6vOS7Eb_e5Tz6x3eAYE/pub?gid=1385638631&single=true&output=csv";
+
+      document.getElementById('btn-load-v1').addEventListener('click', () => {
+        csvInput.value = v1Url;
+      });
+
+      document.getElementById('btn-load-v2').addEventListener('click', () => {
+        csvInput.value = v2Url;
+      });
+
+      ingestBtn.addEventListener('click', async () => {
+        const url = csvInput.value.trim();
+        if (!url) {
+          alert("Please enter a valid Google Sheet CSV URL.");
+          return;
+        }
+
+        ingestBtn.disabled = true;
+        ingestBtn.querySelector('span:first-child').textContent = "Ingesting Data...";
+        
+        try {
+          const ingestAgent = new DataIngestAgent();
+          await ingestAgent.run(url);
+
+          // Populate Preview UI
+          previewRowCount.textContent = state.metadata.rowCount.toLocaleString();
+          previewDateRange.textContent = state.metadata.dateRange.start 
+            ? `${state.metadata.dateRange.start}\nto ${state.metadata.dateRange.end}` 
+            : 'N/A';
+
+          // Render Schema Table
+          schemaTableBody.innerHTML = '';
+          Object.keys(state.schema).forEach(col => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${col}</td>
+              <td><span class="type-badge ${state.schema[col]}">${state.schema[col]}</span></td>
+            `;
+            schemaTableBody.appendChild(tr);
+          });
+
+          // Render Sample Rows Headers
+          sampleHeadersRow.innerHTML = '';
+          state.metadata.columnNames.forEach(col => {
+            const th = document.createElement('th');
+            th.textContent = col;
+            sampleHeadersRow.appendChild(th);
+          });
+
+          // Render Sample Rows Body
+          sampleRowsTableBody.innerHTML = '';
+          state.sampleRows.forEach(row => {
+            const tr = document.createElement('tr');
+            state.metadata.columnNames.forEach(col => {
+              const td = document.createElement('td');
+              td.textContent = row[col] || '';
+              td.title = row[col] || '';
+              tr.appendChild(td);
+            });
+            sampleRowsTableBody.appendChild(tr);
+          });
+
+          // Reveal preview container
+          previewContainer.style.display = 'block';
+          document.getElementById('step-1').scrollIntoView({ behavior: 'smooth' });
+        } catch (err) {
+          alert(`Data Ingestion Failed: ${err.message}. Make sure the CSV URL is correct and public.`);
+        } finally {
+          ingestBtn.disabled = false;
+          ingestBtn.querySelector('span:first-child').textContent = "Run Ingestion Pipeline";
+        }
+      });
+
+      confirmStep1Btn.addEventListener('click', () => {
+        goToStep(2);
+      });
+
+      // --- STEP 2: BUSINESS QUESTIONS CONTROL ---
+      const submitQuestionsBtn = document.getElementById('btn-submit-questions');
+      const questionInputs = document.querySelectorAll('.question-input');
+
+      // Prefill Questions
+      questionInputs.forEach((input, index) => {
+        if (state.questions[index]) {
+          input.value = state.questions[index];
+        }
+      });
+
+      document.getElementById('btn-back-to-step1').addEventListener('click', () => {
+        goToStep(1);
+      });
+
+      submitQuestionsBtn.addEventListener('click', async () => {
+        const questionsList = [];
+        questionInputs.forEach(input => {
+          const val = input.value.trim();
+          if (val) questionsList.push(val);
+        });
+
+        if (questionsList.length === 0) {
+          alert("Please specify at least 1 business question.");
+          return;
+        }
+
+        // Save questions
+        state.questions = questionsList;
+
+        submitQuestionsBtn.disabled = true;
+        submitQuestionsBtn.querySelector('span:first-child').textContent = "AI Planning Chart Configs...";
+
+        try {
+          const plannerAgent = new ChartPlannerAgent();
+          await plannerAgent.run(state.questions);
+          
+          // Render Step 3
+          renderRecommendationCards();
+          goToStep(3);
+        } catch (err) {
+          alert(`AI Chart Planning Failed: ${err.message}. Check your API Key settings.`);
+        } finally {
+          submitQuestionsBtn.disabled = false;
+          submitQuestionsBtn.querySelector('span:first-child').textContent = "Analyze Questions";
+        }
+      });
+
+      // --- STEP 3: RECOMMENDATIONS EDIT GRID ---
+      const recsGrid = document.getElementById('recommendations-grid');
+      const confirmConfigsBtn = document.getElementById('btn-confirm-configs');
+      const thumbnails = {}; // store mini chart instances
+
+      document.getElementById('btn-back-to-step2').addEventListener('click', () => {
+        goToStep(2);
+      });
+
+      function renderRecommendationCards() {
+        recsGrid.innerHTML = '';
+        
+        state.configs.forEach((config, index) => {
+          const card = document.createElement('div');
+          card.className = 'config-card';
+          
+          // Populate dynamic dropdown options
+          const columns = state.metadata.columnNames;
+          const typeOptions = ['bar', 'line', 'donut', 'scatter', 'pie']
+            .map(t => `<option value="${t}" ${config.chartType === t ? 'selected' : ''}>${t.toUpperCase()}</option>`)
+            .join('');
+
+          const xOptions = columns
+            .map(col => `<option value="${col}" ${config.xAxisColumn === col ? 'selected' : ''}>${col}</option>`)
+            .join('');
+
+          const yOptions = ['(Count Rows)', ...columns]
+            .map(col => {
+              const val = col === '(Count Rows)' ? '' : col;
+              return `<option value="${val}" ${config.yAxisColumn === val ? 'selected' : ''}>${col}</option>`;
+            })
+            .join('');
+
+          card.innerHTML = `
+            <div class="config-card-info">
+              <div>
+                <div class="config-card-question">${config.question}</div>
+                <div class="config-card-reasoning">${config.reasoning}</div>
+              </div>
+              <div class="config-card-controls">
+                <div class="control-select-group">
+                  <label>Chart Type</label>
+                  <select class="select-control type-select" data-index="${index}">
+                    ${typeOptions}
+                  </select>
+                </div>
+                <div class="control-select-group">
+                  <label>X-Axis (Dimension)</label>
+                  <select class="select-control x-select" data-index="${index}">
+                    ${xOptions}
+                  </select>
+                </div>
+                <div class="control-select-group">
+                  <label>Y-Axis (Value Metric)</label>
+                  <select class="select-control y-select" data-index="${index}">
+                    ${yOptions}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="config-card-preview">
+              <canvas id="mini-chart-${index}"></canvas>
+            </div>
+          `;
+          
+          recsGrid.appendChild(card);
+          
+          // Draw thumbnail
+          setTimeout(() => {
+            renderThumbnail(index);
+          }, 50);
+        });
+
+        // Add event listeners to dropdowns to update thumbnails dynamically
+        recsGrid.querySelectorAll('.select-control').forEach(select => {
+          select.addEventListener('change', (e) => {
+            const index = parseInt(e.target.dataset.index, 10);
+            const card = e.target.closest('.config-card');
+            
+            // Sync values to config
+            state.configs[index].chartType = card.querySelector('.type-select').value;
+            state.configs[index].xAxisColumn = card.querySelector('.x-select').value;
+            state.configs[index].yAxisColumn = card.querySelector('.y-select').value;
+
+            // Redraw thumbnail
+            renderThumbnail(index);
+          });
+        });
+      }
+
+      function renderThumbnail(index) {
+        const config = state.configs[index];
+        const ctx = document.getElementById(`mini-chart-${index}`).getContext('2d');
+        
+        // Destroy existing
+        if (thumbnails[index]) {
+          thumbnails[index].destroy();
+        }
+
+        // Aggregate temporary mock/sample data for quick render
+        const executor = new DataExecutionAgent();
+        const aggregated = executor.aggregateData(state.rawData, state.schema, config);
+        
+        const labels = aggregated.map(r => r.label);
+        const dataValues = aggregated.map(r => r.value);
+        
+        // Color tokens
+        const primaryColor = '#6366f1';
+        const accentColor = '#06b6d4';
+        
+        const chartColors = config.chartType === 'donut' || config.chartType === 'pie'
+          ? ['#6366f1', '#a855f7', '#06b6d4', '#10b981', '#fbbf24', '#f87171']
+          : primaryColor;
+
+        thumbnails[index] = new Chart(ctx, {
+          type: config.chartType === 'donut' ? 'doughnut' : (config.chartType === 'pie' ? 'pie' : (config.chartType === 'line' ? 'line' : 'bar')),
+          data: {
+            labels: labels,
+            datasets: [{
+              data: dataValues,
+              backgroundColor: chartColors,
+              borderColor: config.chartType === 'line' ? accentColor : 'transparent',
+              borderWidth: config.chartType === 'line' ? 2 : 0,
+              tension: 0.3
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: false }
+            },
+            scales: config.chartType === 'donut' || config.chartType === 'pie' ? {} : {
+              x: { display: false },
+              y: { display: false }
+            }
+          }
+        });
+      }
+
+      confirmConfigsBtn.addEventListener('click', async () => {
+        goToStep(4); // navigate to dashboard steps
+        await runDashboardPipeline();
+      });
+
+      // --- STEPS 4 & 5: PIPELINE EXECUTION ---
+      const chartsContainer = document.getElementById('dashboard-charts-container');
+      const refreshBtn = document.getElementById('btn-refresh-dashboard');
+      const activeCharts = [];
+
+      async function runDashboardPipeline() {
+        logger.clear();
+        logger.log("Pipeline", "Initialising Multi-Agent Dashboard Pipeline...", "info");
+        
+        // Reset states
+        updateAgentStatus('ingest', 'complete');
+        updateAgentStatus('planner', 'complete');
+        updateAgentStatus('executor', 'waiting');
+        updateAgentStatus('insights', 'waiting');
+        
+        // Set metadata variables in header
+        document.getElementById('dashboard-date-range-badge').textContent = state.metadata.dateRange.start 
+          ? `${state.metadata.dateRange.start} to ${state.metadata.dateRange.end}` 
+          : 'Dynamic Date Range';
+        document.getElementById('link-google-sheet').href = state.csvUrl;
+
+        // Reset KPIs in UI
+        document.getElementById('kpi-revenue').textContent = '$0';
+        document.getElementById('kpi-orders').textContent = '0';
+        document.getElementById('kpi-delivery').textContent = '0.0 days';
+        chartsContainer.innerHTML = '';
+        document.getElementById('insights-container').innerHTML = '<ul class="insights-list"><li class="insight-item streaming">Insights generator agent preparing prompt analysis...</li></ul>';
+
+        // 1. Data Execution Agent
+        const execAgent = new DataExecutionAgent();
+        let chartDatasets = [];
+        try {
+          chartDatasets = await execAgent.run(state.configs);
+          
+          // Populate KPIs in UI
+          document.getElementById('kpi-revenue').textContent = `$${state.kpis.totalRevenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+          document.getElementById('kpi-orders').textContent = state.kpis.totalOrders.toLocaleString();
+          document.getElementById('kpi-delivery').textContent = `${state.kpis.avgDeliveryDays.toFixed(1)} days`;
+
+          // Render Main Charts one by one
+          chartDatasets.forEach((dataset, index) => {
+            renderMainChart(dataset, index);
+          });
+        } catch (err) {
+          logger.log("Pipeline", `Execution Failed: ${err.message}`, "error");
+          return;
+        }
+
+        // 2. Strategic Insights Agent
+        const insightsAgent = new StrategicInsightsAgent();
+        try {
+          await insightsAgent.run(state.kpis, chartDatasets);
+        } catch (err) {
+          logger.log("Pipeline", `Insights generation Failed: ${err.message}`, "error");
+        }
+      }
+
+      function renderMainChart(dataset, index) {
+        // Destroy existing if any
+        if (activeCharts[index]) {
+          activeCharts[index].destroy();
+        }
+
+        const chartCard = document.createElement('div');
+        chartCard.className = 'chart-card';
+        chartCard.innerHTML = `
+          <h3>${dataset.question}</h3>
+          <div class="chart-card-body">
+            <canvas id="main-chart-${index}"></canvas>
+          </div>
+        `;
+        chartsContainer.appendChild(chartCard);
+
+        const ctx = document.getElementById(`main-chart-${index}`).getContext('2d');
+        const labels = dataset.data.map(r => r.label);
+        const dataValues = dataset.data.map(r => r.value);
+        
+        const isDoughnutOrPie = dataset.config.chartType === 'donut' || dataset.config.chartType === 'pie';
+        const isLine = dataset.config.chartType === 'line';
+
+        const chartColors = isDoughnutOrPie
+          ? ['rgba(99, 102, 241, 0.75)', 'rgba(168, 85, 247, 0.75)', 'rgba(6, 182, 212, 0.75)', 'rgba(16, 185, 129, 0.75)', 'rgba(251, 191, 36, 0.75)', 'rgba(248, 113, 113, 0.75)']
+          : 'rgba(99, 102, 241, 0.75)';
+
+        const borderColors = isDoughnutOrPie
+          ? ['#6366f1', '#a855f7', '#06b6d4', '#10b981', '#fbbf24', '#f87171']
+          : (isLine ? '#06b6d4' : 'transparent');
+
+        activeCharts[index] = new Chart(ctx, {
+          type: dataset.config.chartType === 'donut' ? 'doughnut' : (dataset.config.chartType === 'pie' ? 'pie' : (isLine ? 'line' : 'bar')),
+          data: {
+            labels: labels,
+            datasets: [{
+              data: dataValues,
+              backgroundColor: chartColors,
+              borderColor: borderColors,
+              borderWidth: isLine ? 3 : 1,
+              tension: 0.35,
+              fill: isLine ? {
+                target: 'origin',
+                above: 'rgba(6, 182, 212, 0.05)'
+              } : false
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: isDoughnutOrPie,
+                position: 'right',
+                labels: {
+                  color: '#94a3b8',
+                  font: { family: 'Outfit', size: 11 }
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                titleFont: { family: 'Outfit', size: 12, weight: 'bold' },
+                bodyFont: { family: 'Outfit', size: 12 },
+                borderColor: 'rgba(255, 255, 255, 0.08)',
+                borderWidth: 1
+              }
+            },
+            scales: isDoughnutOrPie ? {} : {
+              x: {
+                grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                ticks: { color: '#94a3b8', font: { family: 'Outfit', size: 10 } }
+              },
+              y: {
+                grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                ticks: { 
+                  color: '#94a3b8', 
+                  font: { family: 'Outfit', size: 10 },
+                  callback: function(value) {
+                    if (value >= 1000) {
+                      return '$' + (value / 1000) + 'k';
+                    }
+                    return /revenue|sales|price|amount/i.test(dataset.config.yAxisColumn) ? '$' + value : value;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      refreshBtn.addEventListener('click', async () => {
+        logger.log("Refresh", "Rerunning complete pipeline from raw file ingestion...", "info");
+        try {
+          // 1. Ingest
+          const ingestAgent = new DataIngestAgent();
+          await ingestAgent.run(state.csvUrl);
+          // 2. Chart planning
+          const plannerAgent = new ChartPlannerAgent();
+          await plannerAgent.run(state.questions);
+          // 3. Execution
+          await runDashboardPipeline();
+        } catch (err) {
+          alert(`Pipeline reload failed: ${err.message}`);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
